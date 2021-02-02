@@ -1,22 +1,24 @@
-"use strict";
+import * as crypto from "crypto";
+import { promises as fs } from "fs";
+import * as path from "path";
+import { Browser, BrowserType, chromium, firefox, Page, webkit } from "playwright";
 
-const fs = require("fs").promises;
-const path = require("path");
-const playwright = require("playwright");
-
-const walk = require("../browser/walk");
+import { walk } from "../browser/walk";
 
 /**
  * const monitor = new Monitor("https://www.baidu.com", options);
  * monitor.capture();
  */
-class Monitor {
+export class Monitor {
   DEFAULT_BROWSER = "chromium";
 
-  constructor(url, options) {
-    this.url = url;
-    this.options = options;
-  }
+  browsers: { [key: string]: BrowserType<Browser> } = {
+    chromium,
+    firefox,
+    webkit,
+  };
+
+  constructor(private url: string, private options: any) {}
 
   /**
    * save capture
@@ -27,7 +29,7 @@ class Monitor {
    * @param {string|number} time
    * @returns {{time: number, dir: string, screenshot: string}}
    */
-  async save(page, url, tree, rect, time) {
+  async save(page: Page, url: string, tree: string | object, time?: number) {
     time = time || Date.now();
 
     if (tree instanceof Object) {
@@ -41,23 +43,21 @@ class Monitor {
     });
 
     await page.screenshot({ path: path.join(dir, "screenshot.png") });
-    await fs.writeFile(path.join(dir, "tree"), tree);
-    await fs.writeFile(path.join(dir, "info"), JSON.stringify({ time, url }));
+    await fs.writeFile(path.join(dir, "tree.json"), tree);
+    await fs.writeFile(path.join(dir, "info.json"), JSON.stringify({ time, url }));
     return { time, dir, screenshot: "screenshot.png" };
   }
 
   async capture() {
-    const browser = await playwright[this.DEFAULT_BROWSER].launch();
+    const browser = await this.browsers[this.DEFAULT_BROWSER].launch();
     const context = await browser.newContext();
+    await context.exposeFunction("md5", (text) => crypto.createHash("md5").update(text).digest("hex"));
     const page = await context.newPage();
     await page.goto(this.url);
-    const right = await page.evaluate(walk, [1, this.options.walk]);
-    const rect = right.rect;
+    const right = await page.evaluate(walk, this.options.walk);
     const json = JSON.stringify(right);
-    await this.save(page, this.url, json, rect);
+    await this.save(page, this.url, json);
     await page.close();
     await browser.close();
   }
 }
-
-module.exports = Monitor;

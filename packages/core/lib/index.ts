@@ -1,7 +1,7 @@
 "use strict";
 
-const Monitor = require("./main/monitor.js");
-const options = require("./options");
+import { Monitor } from "./main/monitor";
+import { options } from "./options";
 
 const monitor = new Monitor("https://www.baidu.com", options);
 monitor.capture();

@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = {
+export const options = {
   walk: {
     invisibleElements: [
       "applet",
