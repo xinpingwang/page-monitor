@@ -1,5 +1,5 @@
 {
-  "name": "core",
+  "name": "@page-monitor/core",
   "version": "0.0.0",
   "description": "yet another page-monitor implementation",
   "author": "XinPing Wang <xinping.wang@hotmail.com>",
