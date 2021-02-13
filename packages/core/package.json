@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "build": "tsc",
+    "build": "tsc && cp ./lib/main/highlight.html ./build/lib/main/",
     "capture": "node ./build/lib/index.js"
   },
   "dependencies": {

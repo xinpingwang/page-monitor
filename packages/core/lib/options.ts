@@ -1,4 +1,6 @@
-"use strict";
+import * as path from "path";
+
+import { base64 } from "./main/util";
 
 export const options = {
   walk: {
@@ -113,5 +115,61 @@ export const options = {
     ignoreStyleSelectors: [], // ignore style change
     ignoreChildrenSelectors: [], //
     root: "body",
+  },
+  render: {
+    format: "png",
+    quality: 80,
+  },
+  diff: {
+    // LCS diff priority, `head` or `tail`
+    priority: "head",
+    changeType: {
+      ADD: 1, // 0001
+      REMOVE: 2, // 0010
+      STYLE: 4, // 0100
+      TEXT: 8, // 1000
+    },
+    // highlight mask styles
+    highlight: {
+      add: {
+        title: "新增(Added)",
+        backgroundColor: "rgba(127, 255, 127, 0.3)",
+        borderColor: "#090",
+        color: "#060",
+        textShadow: "0 1px 1px rgba(0, 0, 0, 0.3)",
+      },
+      remove: {
+        title: "删除(Removed)",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        borderColor: "#999",
+        color: "#fff",
+      },
+      style: {
+        title: "样式(Style)",
+        backgroundColor: "rgba(255, 0, 0, 0.3)",
+        borderColor: "#f00",
+        color: "#f00",
+      },
+      text: {
+        title: "文本(Text)",
+        backgroundColor: "rgba(255, 255, 0, 0.3)",
+        borderColor: "#f90",
+        color: "#c30",
+      },
+    },
+  },
+  path: {
+    root: path.join(process.cwd(), "capture"), // data and screenshot save path root
+
+    // save path format, it can be a string
+    // like this: '{hostname}/{port}/{pathname}/{query}{hash}'
+    format: function (url, opt) {
+      return [
+        opt.hostname,
+        opt.port ? "-" + opt.port : "",
+        "/",
+        base64(opt.path + (opt.hash || "")).replace(/\//g, "."),
+      ].join("");
+    },
   },
 };

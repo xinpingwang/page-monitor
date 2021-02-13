@@ -94,9 +94,8 @@ export async function walk(data: any): Promise<ElementSnapshot> {
 
   /**
    * get attributes of element
-   * @returns {Object|boolean}
    */
-  function getAttr(element: HTMLElement) {
+  function getAttr(element: HTMLElement): object {
     const ret = {};
     const filters = ATTR_FILTERS.slice(0);
     let hasAttr = false;
@@ -110,7 +109,7 @@ export async function walk(data: any): Promise<ElementSnapshot> {
         ret[key] = attr;
       }
     });
-    return hasAttr ? ret : false;
+    return hasAttr ? ret : null;
   }
 
   /**
@@ -159,11 +158,8 @@ export async function walk(data: any): Promise<ElementSnapshot> {
   async function walkDom(element: HTMLElement): Promise<ElementSnapshot> {
     const node: ElementSnapshot = {
       name: "",
-      rect: null,
-      attr: null,
-      style: "",
-      child: [],
       text: "",
+      child: [],
     };
     if (element.nodeType === Node.ELEMENT_NODE) {
       // element
